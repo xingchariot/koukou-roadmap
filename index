@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>道しるべ ― 高校進学ロードマップ</title>
+<style>
+  :root{
+    --bg: #FAFAF8;
+    --bg-panel: #FFFFFF;
+    --ink: #202733;
+    --ink-soft: #4A5262;
+    --line: #DEDAD0;
+    --blue: #1C54D6;
+    --blue-soft: #E7EEFC;
+    --amber: #9A5B12;
+    --amber-soft: #FBEEDD;
+    --teal: #0C6E63;
+    --teal-soft: #E3F2EF;
+    --focus: #1C54D6;
+    --radius: 16px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; font-size:16px !important;}
+  html.fs-large{font-size:18.5px !important;}
+  html.fs-xlarge{font-size:20.5px !important;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    line-height:1.8; -webkit-font-smoothing:antialiased;
+  }
+  body.easy-mode .normal{display:none;}
+  body:not(.easy-mode) .easy{display:none;}
+  :focus-visible{outline:3px solid var(--focus); outline-offset:2px;}
+
+  .skip-link{
+    position:absolute; left:-9999px; top:0; background:var(--ink); color:#fff;
+    padding:10px 16px; z-index:100; border-radius:0 0 8px 0;
+  }
+  .skip-link:focus{left:0;}
+
+  header.top{
+    position:sticky; top:0; z-index:50;
+    background:rgba(250,250,248,0.96);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .brand{
+    font-weight:900; font-size:1.05rem; color:var(--ink);
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .brand small{ font-weight:500; font-size:0.72rem; color:var(--ink-soft); }
+  .controls{display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
+
+  .fs-group{ display:flex; gap:3px; border:1.5px solid var(--line); border-radius:999px; padding:3px; background:#fff; }
+  .fs-group button{
+    font-family:inherit; font-weight:700; cursor:pointer; border:none; background:transparent;
+    color:var(--ink); border-radius:999px; padding:5px 9px; font-size:0.72rem;
+  }
+  .fs-group button[aria-pressed="true"]{background:var(--blue); color:#fff;}
+
+  .btn{
+    font-family:inherit; font-size:0.8rem; font-weight:700; cursor:pointer;
+    border-radius:999px; border:1.5px solid var(--line); background:#fff; color:var(--ink);
+    padding:7px 13px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .btn.active{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .btn.speak{background:var(--teal-soft); border-color:var(--teal); color:var(--teal);}
+  .btn.speak.speaking{background:var(--amber); border-color:var(--amber); color:#fff;}
+
+  .voice-warning{
+    display:none; margin:10px 14px 0; padding:10px 12px; border-radius:10px;
+    background:var(--amber-soft); border:1px solid #E8CBA0; color:#5F3A0C; font-size:0.82rem;
+  }
+  .voice-warning.show{display:block;}
+
+  .disclaimer-bar{
+    max-width:640px; margin:10px auto 0; padding:0 14px;
+  }
+  .disclaimer-bar summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:6px;
+    font-size:0.76rem; color:#6B4611; background:var(--amber-soft); border:1px solid #E8CBA0;
+    border-radius:10px; padding:6px 10px;
+  }
+  .disclaimer-bar summary::-webkit-details-marker{display:none;}
+  .disclaimer-bar[open] summary{border-radius:10px 10px 0 0;}
+  .disclaimer-bar .body{
+    font-size:0.8rem; color:#5F3A0C; background:#FFFCF7; border:1px solid #E8CBA0; border-top:none;
+    border-radius:0 0 10px 10px; padding:10px 12px;
+  }
+
+  main{max-width:640px; margin:0 auto; padding:14px 14px 60px;}
+
+  /* progress */
+  .progress-wrap{ margin:10px 0 4px; }
+  .progress-label{ font-size:0.78rem; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+  .dots{ display:flex; gap:5px; flex-wrap:wrap; }
+  .dot{
+    width:9px; height:9px; border-radius:50%; background:transparent; border:2px solid var(--line);
+  }
+  .dot.done{ background:var(--teal); border-color:var(--teal); }
+  .dot.current{ background:var(--blue); border-color:var(--blue); width:12px; height:12px; }
+
+  /* step card */
+  .step-card{
+    margin-top:14px; background:var(--bg-panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:22px 20px; box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .step-head{ display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+  .icon-circle{
+    flex:0 0 auto; width:52px; height:52px; border-radius:50%;
+    background:var(--blue-soft); color:var(--blue);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .icon-circle svg{ width:28px; height:28px; }
+  .step-card.is-urgent .icon-circle{ background:var(--amber-soft); color:var(--amber); }
+  .step-meta .period{ font-size:0.74rem; font-weight:700; color:var(--ink-soft); letter-spacing:.04em; }
+  .step-card h2{ font-size:1.15rem; margin:2px 0 0; }
+
+  .step-desc{ font-size:0.95rem; margin:4px 0 14px; }
+
+  .checklist{ list-style:none; margin:0 0 4px; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .checklist li{
+    display:flex; align-items:flex-start; gap:10px; background:#FBFBF9;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+  }
+  .checklist li input[type=checkbox]{ width:20px; height:20px; margin-top:1px; accent-color:var(--teal); flex:0 0 auto; cursor:pointer; }
+  .checklist li label{ flex:1; cursor:pointer; font-size:0.9rem; }
+  .checklist li.done{ opacity:.55; }
+  .checklist li.done label{ text-decoration:line-through; }
+
+  .tip-box{
+    margin-top:10px; background:var(--teal-soft); border:1px dashed var(--teal);
+    border-radius:10px; padding:10px 12px; font-size:0.82rem;
+  }
+  .tip-box .label{ font-weight:700; color:var(--teal); margin-bottom:3px; }
+
+  .watch{
+    margin-top:14px; padding:10px 12px; border-radius:10px; font-size:0.82rem;
+    background:var(--amber-soft); color:#5F3A0C; border:1px solid #E8CBA0;
+    display:flex; gap:8px; align-items:flex-start;
+  }
+  .watch svg{ flex:0 0 auto; width:16px; height:16px; margin-top:2px; }
+
+  /* branch question */
+  .branch{ margin-top:18px; border-top:1px solid var(--line); padding-top:14px; }
+  .branch .q{ font-weight:700; font-size:0.95rem; margin-bottom:10px; }
+  .options{ display:flex; flex-direction:column; gap:8px; }
+  .option{
+    display:flex; align-items:center; gap:10px; border:1.5px solid var(--line); border-radius:12px;
+    padding:11px 13px; cursor:pointer; background:#fff;
+  }
+  .option input[type=radio]{ width:19px; height:19px; accent-color:var(--blue); flex:0 0 auto; }
+  .option.selected{ border-color:var(--blue); background:var(--blue-soft); }
+  .option span{ font-size:0.9rem; }
+
+  .nav-row{ display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px; }
+  .nav-btn{
+    font-family:inherit; font-weight:700; cursor:pointer; border-radius:999px; padding:10px 18px; font-size:0.88rem;
+    border:1.5px solid var(--line); background:#fff; color:var(--ink);
+  }
+  .nav-btn.primary{ background:var(--blue); border-color:var(--blue); color:#fff; }
+  .nav-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .nav-btn.ghost{ background:transparent; }
+
+  footer{ max-width:640px; margin:24px auto 0; padding:14px 14px 40px; color:var(--ink-soft); font-size:0.72rem; border-top:1px solid var(--line); }
+
+  #rubyGlossary{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">本文へスキップ</a>
+
+<header class="top">
+  <div class="brand">道しるべ <small>高校進学ロードマップ(試作)</small></div>
+  <div class="controls">
+    <div class="fs-group" role="group" aria-label="文字の大きさ">
+      <button data-fs="normal" aria-pressed="true">標準</button>
+      <button data-fs="large" aria-pressed="false">大</button>
+      <button data-fs="xlarge" aria-pressed="false">特大</button>
+    </div>
+    <button class="btn" id="easyToggle" aria-pressed="false">やさしい日本語</button>
+    <button class="btn speak" id="speakStep" aria-pressed="false" data-play-label="🔊 読み上げ" data-stop-label="⏹ 止める">🔊 読み上げ</button>
+  </div>
+</header>
+
+<div class="voice-warning" id="voiceWarning" role="status">
+  <span class="normal">この端末では日本語の読み上げ音声が見つかりませんでした。端末の設定アプリで「読み上げ」または「音声合成」から日本語の音声をインストール・有効にすると使えるようになります。</span>
+  <span class="easy">この きき（スマホ・タブレット）で、にほんごの こえが みつかりませんでした。せっていアプリで にほんごの こえを ONに して ください。</span>
+</div>
+
+<details class="disclaimer-bar">
+  <summary>
+    <span class="normal">⚠ 試作段階です・くわしく見る</span>
+    <span class="easy">⚠ まだ ためして いる だんかいです・くわしく みる</span>
+  </summary>
+  <div class="body">
+    <span class="normal">このアプリはまだ試作の段階で、現職の教員による内容確認は完了していません。出席日数や成績の基準、選抜の方法、在留資格更新の条件は、自治体・学校・在留資格の種類によって異なります。必ず担任の先生、スクールソーシャルワーカー、自治体の相談窓口、または行政書士に確認してください。ここで選んだ内容や入力は、どこにも保存・送信されません。</span>
+    <span class="easy">この アプリは まだ ためして いる だんかいで、<ruby>学校<rt>がっこう</rt></ruby>の <ruby>先生<rt>せんせい</rt></ruby>に まだ ないようを みて もらって いません。「だいたいの ながれ」を しめして いるだけです。ほんとうの ルールは、<ruby>学校<rt>がっこう</rt></ruby>や <ruby>市役所<rt>しやくしょ</rt></ruby>、<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>に よって ちがいます。かならず <ruby>先生<rt>せんせい</rt></ruby>や <ruby>相談窓口<rt>そうだんまどぐち</rt></ruby>に きいて ください。ここで えらんだ ことや いれた ことは、ほぞん されません。</span>
+  </div>
+</details>
+
+<main id="main">
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="step-card" id="stepCard"></div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="backBtn">← もどる</button>
+    <button class="nav-btn primary" id="nextBtn">次へ →</button>
+  </div>
+</main>
+
+<footer>
+  <span class="normal">選んだ内容やチェックした項目は、ブラウザの中だけで扱われ、サーバーに送信・保存されません。ページを閉じるか再読み込みすると消えます。／プロトタイプ版：外国につながる子ども・保護者・支援者向け進学ガイド</span>
+  <span class="easy">えらんだ ことや チェックした ことは、パソコンや スマホの なかだけに あります。ほぞんされません。ページを とじると きえます。</span>
+</footer>
+
+<!-- 読み上げ用の読み方辞書のもと。表示はされないが、ふりがなの読み方をここから収集する -->
+<div id="rubyGlossary" aria-hidden="true">
+  <ruby>通知表<rt>つうちひょう</rt></ruby><ruby>欠席日数<rt>けっせきにっすう</rt></ruby><ruby>出席日数<rt>しゅっせきにっすう</rt></ruby>
+  <ruby>説明会<rt>せつめいかい</rt></ruby><ruby>在留資格<rt>ざいりゅうしかく</rt></ruby><ruby>出願<rt>しゅつがん</rt></ruby>
+  <ruby>全日制<rt>ぜんにちせい</rt></ruby><ruby>定時制<rt>ていじせい</rt></ruby><ruby>通信制<rt>つうしんせい</rt></ruby>
+  <ruby>内申点<rt>ないしんてん</rt></ruby><ruby>調査書<rt>ちょうさしょ</rt></ruby><ruby>就学支援金<rt>しゅうがくしえんきん</rt></ruby>
+  <ruby>三者面談<rt>さんしゃめんだん</rt></ruby><ruby>単位<rt>たんい</rt></ruby><ruby>卒業<rt>そつぎょう</rt></ruby>
+  <ruby>進学<rt>しんがく</rt></ruby><ruby>就職<rt>しゅうしょく</rt></ruby><ruby>奨学金<rt>しょうがくきん</rt></ruby>
+  <ruby>高校<rt>こうこう</rt></ruby><ruby>選抜<rt>せんばつ</rt></ruby><ruby>面接<rt>めんせつ</rt></ruby>
+</div>
+
+<script>
+// ================== データモデル ==================
+const state = { schoolType: null, afterGrad: null };
+
+function pick(variants, key){
+  return variants[key] || variants.default;
+}
+
+const ICONS = {
+  alert: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2 1 21h22L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>`,
+  chat: `<svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v10H9l-4 4v-4H4V5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="7" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10l6-4 6 4v10" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><rect x="9" y="13" width="4" height="7" stroke="currentColor" stroke-width="1.5"/><circle cx="17" cy="15" r="3" stroke="currentColor" stroke-width="1.7"/><line x1="19.2" y1="17.2" x2="21.5" y2="19.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  people: `<svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="7" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 19v-1.3C3 15 5.4 13.6 8 13.6s5 1.4 5 4.1V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="17" cy="8" r="2.1" stroke="currentColor" stroke-width="1.6"/><path d="M13.6 19v-1.1c0-1.9 1.7-3.1 3.6-3.1s3.6 1.2 3.6 3.1V19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  document: `<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v4h4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><line x1="9.5" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9.5" y1="15.5" x2="16" y2="15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  exam: `<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="1.2" stroke="currentColor" stroke-width="1.7"/><path d="M9 12l2.2 2.2L16 9.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  key: `<svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M10 12h10M17 12v3M20 12v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="1.2" stroke="currentColor" stroke-width="1.7"/><line x1="4" y1="9" x2="20" y2="9" stroke="currentColor" stroke-width="1.7"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8.5 14l2 2 4.5-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  signpost: `<svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="21" x2="12" y2="9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 9h6l-2 2.2 2 2.2h-6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 6.4H7.5l1.5 1.9-1.5 1.9H12" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>`,
+  cap: `<svg viewBox="0 0 24 24" fill="none"><path d="M2 9l10-4 10 4-10 4-10-4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7 11.3v4c0 1.4 2.2 2.4 5 2.4s5-1 5-2.4v-4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><line x1="21" y1="9" x2="21" y2="15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>`
+};
+
+const steps = [
+  { // 0: 今すぐやること
+    id:"urgent", icon:"alert", urgent:true,
+    periodN:"今週中", periodE:"こんしゅう じゅうに",
+    titleN:"今すぐやること", titleE:"いま すぐ やる こと",
+    descN:"説明会に行く前に、この3つだけは確認してください。",
+    descE:"せつめいかいに いく まえに、この3つを かくにん して ください。",
+    items:[
+      { n:"1・2年生の欠席日数を確認する", e:"1<ruby>年生<rt>ねんせい</rt></ruby>・2<ruby>年生<rt>ねんせい</rt></ruby>の <ruby>欠席日数<rt>けっせきにっすう</rt></ruby>を しらべる" },
+      { n:"説明会で確認する質問リストを作る", e:"<ruby>説明会<rt>せつめいかい</rt></ruby>で きく ことを リストに する" },
+      { n:"在留資格の種類と有効期限を確認する", e:"<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の しゅるいと、いつまで あるかを みる" }
+    ],
+    tipN:"「1年生と2年生の欠席日数を教えてください。3年生の受験の準備のために知りたいです。」",
+    tipE:"「1<ruby>年生<rt>ねんせい</rt></ruby>と 2<ruby>年生<rt>ねんせい</rt></ruby>の けっせきの かずを おしえて ください。じゅけんの じゅんびの ために しりたいです。」"
+  },
+  { // 1: 進路希望調査と説明会 + 分岐(schoolType)
+    id:"s1", icon:"chat",
+    periodN:"中3・4〜6月", periodE:"ちゅうさん・4〜6がつ",
+    titleN:"進路希望調査と説明会", titleE:"しんろの きぼうを だす、<ruby>説明会<rt>せつめいかい</rt></ruby>",
+    descN:"学校から進路希望調査が配られ、高校の説明会が始まる時期です。まずは高校にいくつか種類があることを知りましょう。入試の正式な要項（金額や日程の詳細）は、多くの自治体で夏ごろに公開されますが、発表を待たなくても今から始められる準備があります。",
+    descE:"がっこうから「どこの がっこうに いきたいか」の しつもんが あります。<ruby>説明会<rt>せつめいかい</rt></ruby>も はじまります。<ruby>高校<rt>こうこう</rt></ruby>には いろいろな しゅるいが あることを しりましょう。にゅうしの くわしい じょうほう（きんがくや にってい）は、なつごろ こうひょうされる ことが おおいですが、はっぴょうを またなくても いま から できる じゅんびが あります。",
+    items:[
+      { n:"進路希望調査に記入して提出する", e:"しんろきぼう ちょうさに かいて だす" },
+      { n:"家庭で志望校の希望条件を話し合う（自宅からの距離・学費など）", e:"かぞくで いきたい がっこうの じょうけんを はなす（いえから ちかいか、おかねなど）" },
+      { n:"受験にかかる費用（受験料・交通費など）を家庭で話し合い、少しずつ準備しておく", e:"じゅけんに かかる おかね（じゅけんりょう・こうつうひなど）を かぞくで はなして、すこしずつ じゅんびしておく" }
+    ],
+    watchN:"高校は自動で決まりません。公立高校にも学力検査などの選抜があります。また、金額や日程の正式な発表は自治体によって時期が異なるため、今の時点の情報はあくまで目安として捉え、発表され次第あらためて確認してください。",
+    watchE:"<ruby>高校<rt>こうこう</rt></ruby>は じどうで きまりません。<ruby>公立<rt>こうりつ</rt></ruby>の <ruby>高校<rt>こうこう</rt></ruby>にも しけんが あります。きんがくや にっていの せいしきな はっぴょうは、じちたいに よって じきが ちがうので、いまの じょうほうは めやすとして かんがえて、はっぴょうされたら もういちど かくにんして ください。",
+    branch:{
+      key:"schoolType",
+      questionN:"めざす高校のタイプは、今のところどれに近いですか？",
+      questionE:"いきたい <ruby>高校<rt>こうこう</rt></ruby>の タイプは、いま どれに ちかいですか？",
+      options:[
+        { value:"zennichi", labelN:"全日制（ふつうの昼間の高校）", labelE:"<ruby>全日制<rt>ぜんにちせい</rt></ruby>（ひるまの がっこう）" },
+        { value:"teiji_tsushin", labelN:"定時制・通信制", labelE:"<ruby>定時制<rt>ていじせい</rt></ruby>・<ruby>通信制<rt>つうしんせい</rt></ruby>" },
+        { value:"unknown", labelN:"まだ決めていない", labelE:"まだ きめて いない" }
+      ]
+    }
+  },
+  { // 2: 学校見学
+    id:"s2", icon:"search",
+    periodN:"中3・7〜9月", periodE:"ちゅうさん・7〜9がつ",
+    titleN:"学校見学（オープンスクール）", titleE:"がっこう<ruby>見学<rt>けんがく</rt></ruby>（オープンスクール）",
+    descN:"実際に高校を見学できる時期です。複数校を見て比較することが大切です。",
+    descE:"じっさいに <ruby>高校<rt>こうこう</rt></ruby>を みに いける じきです。いくつか みて くらべる ことが だいじです。",
+    items:[
+      { n:"気になる高校を2〜3校リストアップする", e:"きに なる <ruby>高校<rt>こうこう</rt></ruby>を 2〜3こう リストに する" },
+      { n:"オープンスクールの日程を調べて申し込む", e:"オープンスクールの ひにちを しらべて もうしこむ" },
+      { n:"見学時に日本語サポートの有無を質問する", e:"けんがくの とき、にほんご サポートが あるか きく" }
+    ],
+    watchN:"見学の予約や持ち物の準備は保護者・本人だけで進めず、担任にも相談しておくと安心です。",
+    watchE:"よやくや もちものの じゅんびは、<ruby>担任<rt>たんにん</rt></ruby>の <ruby>先生<rt>せんせい</rt></ruby>にも そうだん して おくと あんしんです。"
+  },
+  { // 3: 三者面談
+    id:"s3", icon:"people",
+    periodN:"中3・10〜11月", periodE:"ちゅうさん・10〜11がつ",
+    titleN:"三者面談と志望校の決定", titleE:"<ruby>三者面談<rt>さんしゃめんだん</rt></ruby>、いく がっこうを きめる",
+    descN:"担任・保護者・本人での三者面談があります。ここまでの欠席日数・成績・見学の結果をもとに、実際に受験する学校を絞り込みます。",
+    descE:"<ruby>担任<rt>たんにん</rt></ruby>と ほごしゃと ほんにんで はなす じかんが あります。けっせきの かずや せいせき、みに いった けっかから、うける がっこうを きめて いきます。",
+    items:[
+      { n:"三者面談の日程を確認し、必ず参加する", e:"<ruby>三者面談<rt>さんしゃめんだん</rt></ruby>の ひを かくにんし、かならず さんかする" },
+      { n:"通訳が必要な場合は事前に学校へ依頼する", e:"つうやくが いる ときは、まえもって がっこうに たのむ" },
+      { n:"「受験校（本命・すべり止め）」を決める", e:"うける がっこうを きめる（だいいち しぼうと、ほかの がっこう）" }
+    ],
+    watchN:"内申点（調査書）は3年生の成績だけでなく、1・2年生の記録も含まれる場合があります。",
+    watchE:"「<ruby>内申点<rt>ないしんてん</rt></ruby>」は 3<ruby>年生<rt>ねんせい</rt></ruby>の せいせきだけでなく、1・2<ruby>年生<rt>ねんせい</rt></ruby>の きろくも はいる ことが あります。"
+  },
+  { // 4: 出願書類 - schoolType依存
+    id:"s4", icon:"document",
+    periodN:"中3・12〜1月", periodE:"ちゅうさん・12〜1がつ",
+    titleN:"出願書類の準備", titleE:"<ruby>出願<rt>しゅつがん</rt></ruby>の しょるいを じゅんびする",
+    descN: state => pick({
+      zennichi:"全日制高校の出願書類（願書・調査書・写真など）を、期限内にそろえます。書類の不備は受験できない原因になるため、余裕を持って進めましょう。",
+      teiji_tsushin:"定時制・通信制高校は、出願の時期や必要書類が全日制と異なる場合があります。願書・調査書・写真などに加えて、学校ごとの違いを説明会や個別相談で必ず確認してください。",
+      unknown:"願書・調査書・写真など、期限内にそろえる書類が多い時期です。全日制・定時制・通信制で書類や時期が異なることがあるため、まだ決めていない場合はその違いも聞いておくと安心です。",
+      default:"願書・調査書・写真など、期限内にそろえる書類が多い時期です。書類の不備は受験できない原因になるため、余裕を持って進めます。"
+    }, state.schoolType || "default"),
+    descE: state => pick({
+      zennichi:"<ruby>全日制<rt>ぜんにちせい</rt></ruby>の <ruby>高校<rt>こうこう</rt></ruby>の <ruby>出願<rt>しゅつがん</rt></ruby>の しょるい（がんしょ・<ruby>調査書<rt>ちょうさしょ</rt></ruby>・しゃしんなど）を、きめられた ひまでに そろえます。",
+      teiji_tsushin:"<ruby>定時制<rt>ていじせい</rt></ruby>・<ruby>通信制<rt>つうしんせい</rt></ruby>の <ruby>高校<rt>こうこう</rt></ruby>は、<ruby>出願<rt>しゅつがん</rt></ruby>の じきや しょるいが <ruby>全日制<rt>ぜんにちせい</rt></ruby>と ちがう ことが あります。がっこうに かならず かくにんして ください。",
+      unknown:"がんしょ・<ruby>調査書<rt>ちょうさしょ</rt></ruby>・しゃしんなど、しょるいが おおい じきです。<ruby>全日制<rt>ぜんにちせい</rt></ruby>・<ruby>定時制<rt>ていじせい</rt></ruby>・<ruby>通信制<rt>つうしんせい</rt></ruby>で ちがう ことが あるので、まだ きめて いない ばあいは そのちがいも きいて おくと あんしんです。",
+      default:"がんしょ・<ruby>調査書<rt>ちょうさしょ</rt></ruby>・しゃしんなど、きめられた ひまでに そろえる しょるいが おおい じきです。"
+    }, state.schoolType || "default"),
+    items:[
+      { n:"必要書類のチェックリストを学校からもらう", e:"ひつような しょるいの リストを がっこうから もらう" },
+      { n:"提出期限をカレンダーに書き込む", e:"だす ひを カレンダーに かく" },
+      { n:"写真・印鑑・費用など早めに準備する", e:"しゃしん、はんこ、おかねを はやめに じゅんびする" }
+    ],
+    watchN:"在留資格に関わる書類（在留カード等）が必要な場合があります。写しの提出可否も学校に確認してください。",
+    watchE:"<ruby>在留<rt>ざいりゅう</rt></ruby>カードなどの しょるいが ひつような ことが あります。コピーで いいか、がっこうに きいて ください。"
+  },
+  { // 5: 入試〜入学手続き - schoolType依存
+    id:"s5", icon:"key",
+    periodN:"中3・1〜3月", periodE:"ちゅうさん・1〜3がつ",
+    titleN:"入試本番・合格発表・入学手続き", titleE:"しけん、<ruby>合格発表<rt>ごうかくはっぴょう</rt></ruby>、にゅうがくの てつづき",
+    descN: state => pick({
+      zennichi:"全日制高校は学力検査を中心とした入試が一般的です。試験本番、合格発表、入学手続きと続きます。合格しても手続き期限内に書類を出さないと入学できない場合があるので注意しましょう。",
+      teiji_tsushin:"定時制・通信制高校は、学力検査に加えて面接や作文などが重視される場合があります。授業の時間帯（夜間・オンラインなど）も学校ごとに異なるので、あわせて確認しておきましょう。",
+      unknown:"入試本番、そして合格発表・入学手続きの時期です。選抜の方法は高校の種類によって異なるので、志望校がどちらのタイプかで内容が変わることを念頭に確認しましょう。",
+      default:"入試本番、そして合格発表・入学手続きの時期です。合格しても手続き期限内に書類を提出しないと入学できない場合があるため注意が必要です。"
+    }, state.schoolType || "default"),
+    descE: state => pick({
+      zennichi:"<ruby>全日制<rt>ぜんにちせい</rt></ruby>は がくりょくけんさが ちゅうしんの しけんが おおいです。しけん、<ruby>合格発表<rt>ごうかくはっぴょう</rt></ruby>、にゅうがくの てつづきと つづきます。",
+      teiji_tsushin:"<ruby>定時制<rt>ていじせい</rt></ruby>・<ruby>通信制<rt>つうしんせい</rt></ruby>は、がくりょくけんさに くわえて <ruby>面接<rt>めんせつ</rt></ruby>や さくぶんが おおい ことも あります。じゅぎょうの じかんたいも がっこうごとに ちがいます。",
+      unknown:"しけん、<ruby>合格発表<rt>ごうかくはっぴょう</rt></ruby>、にゅうがくの てつづきの じきです。<ruby>選抜<rt>せんばつ</rt></ruby>の しかたは <ruby>高校<rt>こうこう</rt></ruby>の しゅるいで ちがいます。",
+      default:"しけんが あります。そのあと <ruby>合格発表<rt>ごうかくはっぴょう</rt></ruby>と にゅうがくの てつづきが あります。"
+    }, state.schoolType || "default"),
+    items:[
+      { n:"試験当日の持ち物・集合時間を前日に確認する", e:"しけんの ひ、もちものと あつまる じかんを まえのひに かくにんする" },
+      { n:"合格発表後、入学手続きの期限を確認する", e:"<ruby>合格<rt>ごうかく</rt></ruby>したら、にゅうがくの てつづきの きげんを かくにんする" },
+      { n:"就学支援金・奨学金の申請窓口を確認する", e:"<ruby>就学支援金<rt>しゅうがくしえんきん</rt></ruby>や <ruby>奨学金<rt>しょうがくきん</rt></ruby>の もうしこみさきを しらべる" }
+    ],
+    watchN:"経済的な支援制度（高等学校等就学支援金など）があります。申請は入学後すぐの場合が多いので早めに確認しましょう。",
+    watchE:"おかねの しえん（<ruby>就学支援金<rt>しゅうがくしえんきん</rt></ruby>）が あります。にゅうがく して すぐに もうしこむ ことが おおいので、はやめに しらべましょう。"
+  },
+  { // 6: 高校1年 - schoolType依存
+    id:"s6", icon:"calendar",
+    periodN:"高校1年", periodE:"こうこう1<ruby>年<rt>ねん</rt></ruby>",
+    titleN:"高校生活のスタートと出席の管理", titleE:"<ruby>高校<rt>こうこう</rt></ruby>せいかつの スタートと、しゅっせきの かんり",
+    descN: state => pick({
+      zennichi:"全日制高校は「単位制」で、欠席や遅刻が多いと単位を落とし、進級・卒業に影響します。中学よりも出席の重みが増すことを意識しましょう。",
+      teiji_tsushin:"定時制・通信制は出席の数え方（スクーリングの回数など）が全日制と異なる場合があります。学校ごとのルールを早い段階で担任に確認しておきましょう。",
+      unknown:"高校は「単位制」で、欠席や遅刻が卒業に影響する仕組みです。全日制か定時制・通信制かで出席の数え方が変わるので、通う学校のルールを早めに確認しましょう。",
+      default:"高校は「単位制」で、欠席や遅刻が多いと単位を落とし、進級・卒業に影響します。"
+    }, state.schoolType || "default"),
+    descE: state => pick({
+      zennichi:"<ruby>全日制<rt>ぜんにちせい</rt></ruby>は「<ruby>単位制<rt>たんいせい</rt></ruby>」です。けっせきや ちこくが おおいと、<ruby>単位<rt>たんい</rt></ruby>が とれず、しんきゅうや <ruby>卒業<rt>そつぎょう</rt></ruby>に えいきょうします。",
+      teiji_tsushin:"<ruby>定時制<rt>ていじせい</rt></ruby>・<ruby>通信制<rt>つうしんせい</rt></ruby>は しゅっせきの かぞえかたが <ruby>全日制<rt>ぜんにちせい</rt></ruby>と ちがう ことが あります。がっこうごとの ルールを <ruby>担任<rt>たんにん</rt></ruby>に きいて おきましょう。",
+      unknown:"<ruby>高校<rt>こうこう</rt></ruby>は「<ruby>単位制<rt>たんいせい</rt></ruby>」です。けっせきや ちこくが <ruby>卒業<rt>そつぎょう</rt></ruby>に えいきょうします。がっこうの タイプで かぞえかたが かわります。",
+      default:"<ruby>高校<rt>こうこう</rt></ruby>は「<ruby>単位制<rt>たんいせい</rt></ruby>」です。けっせきや ちこくが おおいと、<ruby>単位<rt>たんい</rt></ruby>が とれません。"
+    }, state.schoolType || "default"),
+    items:[
+      { n:"各科目の欠席・遅刻の上限を確認する", e:"かくかもくの けっせき・ちこくの じょうげんを かくにんする" },
+      { n:"体調不良や困りごとは早めに担任・スクールソーシャルワーカーに相談する", e:"たいちょうふりょうや こまりごとは はやめに せんせいに そうだんする" },
+      { n:"在留資格の更新時期を家庭のカレンダーに記録する", e:"<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の こうしんの じきを カレンダーに かく" }
+    ],
+    watchN:"在留資格の更新には在学状況の証明が必要な場合があります。更新時期を忘れないようにしましょう。",
+    watchE:"<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の こうしんには、がっこうに かよって いる しょうめいが いる ことが あります。わすれないように。"
+  },
+  { // 7: 高校2年 + 分岐(afterGrad)
+    id:"s7", icon:"signpost",
+    periodN:"高校2年", periodE:"こうこう2<ruby>年<rt>ねん</rt></ruby>",
+    titleN:"進路の具体化と在留資格の確認", titleE:"しんろを くわしく かんがえる、<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の かくにん",
+    descN:"大学・専門学校進学や就職など、卒業後の進路を具体的に考え始める時期です。奨学金情報の収集もこの時期から始めると安心です。",
+    descE:"だいがく、せんもんがっこう、しゅうしょくなど、<ruby>卒業<rt>そつぎょう</rt></ruby>あとの みちを くわしく かんがえる じきです。<ruby>奨学金<rt>しょうがくきん</rt></ruby>の じょうほうも、この じきから あつめると あんしんです。",
+    items:[
+      { n:"進路希望調査（大学・専門・就職）に答える", e:"しんろの アンケートに こたえる" },
+      { n:"奨学金・給付金の情報を集め始める", e:"<ruby>奨学金<rt>しょうがくきん</rt></ruby>の じょうほうを あつめはじめる" }
+    ],
+    watchN:"進路によって必要な在留資格の手続きが変わることがあります。早い段階での相談が安心につながります。",
+    watchE:"しんろに よって、<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の てつづきが かわる ことが あります。はやめに そうだんしましょう。",
+    branch:{
+      key:"afterGrad",
+      questionN:"卒業後の進路は、今のところどちらに近いですか？",
+      questionE:"<ruby>卒業<rt>そつぎょう</rt></ruby>あとの しんろは、いま どちらに ちかいですか？",
+      options:[
+        { value:"shingaku", labelN:"進学（大学・専門学校など）", labelE:"<ruby>進学<rt>しんがく</rt></ruby>（だいがく・せんもんがっこうなど）" },
+        { value:"shushoku", labelN:"就職", labelE:"<ruby>就職<rt>しゅうしょく</rt></ruby>" },
+        { value:"mada", labelN:"まだ決めていない", labelE:"まだ きめて いない" }
+      ]
+    }
+  },
+  { // 8: 高3〜卒業 - afterGrad依存
+    id:"s8", icon:"cap",
+    periodN:"高校3年〜卒業", periodE:"こうこう3<ruby>年<rt>ねん</rt></ruby>〜<ruby>卒業<rt>そつぎょう</rt></ruby>",
+    titleN:"卒業要件の確認と進路決定", titleE:"<ruby>卒業<rt>そつぎょう</rt></ruby>の じょうけんの かくにん、しんろを きめる",
+    descN: state => pick({
+      shingaku:"卒業に必要な単位・出席が満たされているか最終確認する時期です。進学の場合、出願手続きに加えて、在留資格の変更（就学継続や進学先に応じた手続き）が必要になることがあるので、早めに学校や専門家に相談しましょう。",
+      shushoku:"卒業に必要な単位・出席が満たされているか最終確認する時期です。就職の場合、内定後に在留資格の変更手続きが必要になることが多いため、早めに学校・専門家（行政書士等）に相談しましょう。",
+      mada:"卒業に必要な単位・出席が満たされているか最終確認する時期です。進路がまだ決まっていない場合も、進学・就職どちらに進んでも在留資格の手続きが関わることが多いので、早めに担任やキャリア相談窓口に相談しておくと安心です。",
+      default:"卒業に必要な単位・出席が満たされているか最終確認する時期です。進学・就職どちらの場合も、在留資格の手続きと連動することが多いので、学校・専門家と並走しながら進めましょう。"
+    }, state.afterGrad || "default"),
+    descE: state => pick({
+      shingaku:"<ruby>卒業<rt>そつぎょう</rt></ruby>に ひつような <ruby>単位<rt>たんい</rt></ruby>と しゅっせきを さいごに かくにんする じきです。<ruby>進学<rt>しんがく</rt></ruby>の ばあい、<ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の てつづきも いる ことが あるので、はやめに そうだんしましょう。",
+      shushoku:"<ruby>卒業<rt>そつぎょう</rt></ruby>に ひつような <ruby>単位<rt>たんい</rt></ruby>と しゅっせきを さいごに かくにんする じきです。<ruby>就職<rt>しゅうしょく</rt></ruby>の ばあい、ないていの あと <ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の てつづきが いる ことが おおいです。",
+      mada:"<ruby>卒業<rt>そつぎょう</rt></ruby>に ひつような <ruby>単位<rt>たんい</rt></ruby>と しゅっせきを さいごに かくにんする じきです。しんろが まだでも、はやめに <ruby>担任<rt>たんにん</rt></ruby>に そうだんしておくと あんしんです。",
+      default:"<ruby>卒業<rt>そつぎょう</rt></ruby>に ひつような <ruby>単位<rt>たんい</rt></ruby>と しゅっせきを さいごに かくにんする じきです。"
+    }, state.afterGrad || "default"),
+    items:[
+      { n:"卒業に必要な単位・出席日数を担任と確認する", e:"<ruby>卒業<rt>そつぎょう</rt></ruby>に ひつような <ruby>単位<rt>たんい</rt></ruby>と しゅっせきを <ruby>先生<rt>せんせい</rt></ruby>と かくにんする" },
+      { n:"進学・就職に応じた在留資格の手続きを確認する", e:"しんがくや しゅうしょくに あわせた <ruby>在留資格<rt>ざいりゅうしかく</rt></ruby>の てつづきを かくにんする" },
+      { n:"卒業後の生活の相談窓口を持っておく", e:"<ruby>卒業<rt>そつぎょう</rt></ruby>あとの そうだんさきを もって おく" }
+    ],
+    watchN:"ここまでの積み重ねがそのまま卒業・進路につながります。困ったときは一人で抱えず、早めに相談してください。",
+    watchE:"ここまでの がんばりが、そのまま <ruby>卒業<rt>そつぎょう</rt></ruby>や つぎの みちに つながります。こまったら ひとりで かかえず、はやめに そうだんして ください。"
+  }
+];
+
+let currentIndex = 0;
+
+// ================== レンダリング ==================
+function resolveText(field, s){
+  return typeof field === "function" ? field(s) : field;
+}
+
+function render(){
+  stopSpeaking();
+  const step = steps[currentIndex];
+  const card = document.getElementById("stepCard");
+  card.classList.toggle("is-urgent", !!step.urgent);
+
+  const itemsHtml = (step.items || []).map((it, i) => `
+    <li id="chk-${step.id}-${i}">
+      <input type="checkbox" id="cb-${step.id}-${i}">
+      <label for="cb-${step.id}-${i}">
+        <span class="normal">${it.n}</span><span class="easy">${it.e}</span>
+      </label>
+    </li>
+  `).join("");
+
+  const tipHtml = step.tipN ? `
+    <div class="tip-box">
+      <div class="label normal">💬 先生に聞くときの言い方（例）</div>
+      <div class="label easy">💬 <ruby>先生<rt>せんせい</rt></ruby>に きく とき の ことば（れい）</div>
+      <span class="normal">${step.tipN}</span><span class="easy">${step.tipE}</span>
+    </div>` : "";
+
+  const watchHtml = step.watchN ? `
+    <div class="watch">
+      ${ICONS.alert}
+      <span><span class="normal">${step.watchN}</span><span class="easy">${step.watchE}</span></span>
+    </div>` : "";
+
+  let branchHtml = "";
+  if(step.branch){
+    const b = step.branch;
+    const optHtml = b.options.map(opt => {
+      const selected = state[b.key] === opt.value;
+      return `
+        <label class="option ${selected ? "selected" : ""}" data-branch-key="${b.key}" data-value="${opt.value}">
+          <input type="radio" name="branch-${b.key}" value="${opt.value}" ${selected ? "checked" : ""}>
+          <span><span class="normal">${opt.labelN}</span><span class="easy">${opt.labelE}</span></span>
+        </label>`;
+    }).join("");
+    branchHtml = `
+      <div class="branch">
+        <div class="q"><span class="normal">${b.questionN}</span><span class="easy">${b.questionE}</span></div>
+        <div class="options">${optHtml}</div>
+      </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="step-head">
+      <div class="icon-circle">${ICONS[step.icon]}</div>
+      <div class="step-meta">
+        <div class="period">${step.periodN}</div>
+        <h2><span class="normal">${step.titleN}</span><span class="easy">${step.titleE}</span></h2>
+      </div>
+    </div>
+    <p class="step-desc"><span class="normal">${resolveText(step.descN, state)}</span><span class="easy">${resolveText(step.descE, state)}</span></p>
+    ${itemsHtml ? `<ul class="checklist">${itemsHtml}</ul>` : ""}
+    ${tipHtml}
+    ${watchHtml}
+    ${branchHtml}
+  `;
+
+  // チェックボックスの見た目更新
+  card.querySelectorAll('.checklist input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      cb.closest('li').classList.toggle('done', cb.checked);
+    });
+  });
+
+  // 分岐選択の処理
+  if(step.branch){
+    card.querySelectorAll('.option').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        const key = opt.dataset.branchKey;
+        const value = opt.dataset.value;
+        state[key] = value;
+        card.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+        opt.classList.add('selected');
+        opt.querySelector('input[type=radio]').checked = true;
+        updateNextButton();
+      });
+    });
+  }
+
+  updateProgress();
+  updateNextButton();
+  document.getElementById('backBtn').disabled = (currentIndex === 0);
+}
+
+function updateNextButton(){
+  const step = steps[currentIndex];
+  const nextBtn = document.getElementById('nextBtn');
+  const isLast = currentIndex === steps.length - 1;
+  nextBtn.textContent = isLast ? "さいごまで見た" : "次へ →";
+  if(step.branch && !state[step.branch.key]){
+    nextBtn.disabled = true;
+  } else {
+    nextBtn.disabled = isLast;
+  }
+}
+
+function updateProgress(){
+  document.getElementById('progressLabel').textContent = `ステップ ${currentIndex + 1} / ${steps.length}`;
+  const dotsEl = document.getElementById('dots');
+  dotsEl.innerHTML = steps.map((s, i) => {
+    const cls = i < currentIndex ? "done" : (i === currentIndex ? "current" : "");
+    return `<span class="dot ${cls}"></span>`;
+  }).join("");
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(currentIndex < steps.length - 1){
+    currentIndex++;
+    render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+});
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  if(currentIndex > 0){
+    currentIndex--;
+    render();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+});
+
+// ================== やさしい日本語 ==================
+const easyBtn = document.getElementById('easyToggle');
+easyBtn.addEventListener('click', ()=>{
+  const active = document.body.classList.toggle('easy-mode');
+  easyBtn.classList.toggle('active', active);
+  easyBtn.setAttribute('aria-pressed', String(active));
+  easyBtn.textContent = active ? "ふつうの表示にもどす" : "やさしい日本語";
+  stopSpeaking();
+});
+
+// ================== 文字サイズ ==================
+// クラスの付け替えに加えて、documentElement.style に直接 !important 付きで
+// font-size を書き込んでおく。埋め込み先（Canvaなど）が独自のCSSを後から
+// 読み込む場合でも、インラインstyleのほうが優先されやすいための二重の対策。
+const FS_PX = { normal: '16px', large: '18.5px', xlarge: '20.5px' };
+document.querySelectorAll('.fs-group button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.documentElement.classList.remove('fs-large','fs-xlarge');
+    const size = btn.dataset.fs;
+    if(size === 'large') document.documentElement.classList.add('fs-large');
+    if(size === 'xlarge') document.documentElement.classList.add('fs-xlarge');
+    document.documentElement.style.setProperty('font-size', FS_PX[size] || FS_PX.normal, 'important');
+    document.querySelectorAll('.fs-group button').forEach(b=>{
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
+  });
+});
+
+// ================== 読み上げ ==================
+const manualPronunciation = {
+  "中1":"ちゅういち", "中2":"ちゅうに", "中3":"ちゅうさん",
+  "高校1年":"こうこういちねん", "高校2年":"こうこうにねん", "高校3年":"こうこうさんねん",
+  "通知表":"つうちひょう"
+};
+
+function buildPronunciationDict(){
+  const dict = {};
+  document.querySelectorAll('ruby').forEach(rubyEl=>{
+    const rt = rubyEl.querySelector('rt');
+    if(!rt) return;
+    const reading = rt.textContent.trim();
+    const baseClone = rubyEl.cloneNode(true);
+    baseClone.querySelectorAll('rt, rp').forEach(n=>n.remove());
+    const base = baseClone.textContent.trim();
+    if(base && reading) dict[base] = reading;
+  });
+  Object.assign(dict, manualPronunciation);
+  return dict;
+}
+let pronunciationDict = null;
+
+function applyPronunciation(text, dict){
+  const keys = Object.keys(dict).sort((a,b)=>b.length - a.length);
+  if(keys.length === 0) return text;
+  const escaped = keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const pattern = new RegExp(escaped.join('|'), 'g');
+  return text.replace(pattern, m => dict[m]);
+}
+
+// 読み上げ用の「間つなぎ」記号。枠線や背景色で独立した箱（チェック項目・注意書き・
+// 選択肢カードなど）は、句読点が無くても意味のまとまりが変わる境目なので、
+// ここに専用の区切り文字を挟んでおき、後で長めの間（ま）を割り当てる。
+const BLOCK_SENTINEL = '\u0001';
+
+function getVisibleText(el){
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('rt, rp').forEach(n=>n.remove());
+  clone.querySelectorAll('.normal, .easy').forEach(span=>{
+    const isEasy = document.body.classList.contains('easy-mode');
+    if((isEasy && span.classList.contains('normal')) || (!isEasy && span.classList.contains('easy'))){
+      span.remove();
+    }
+  });
+
+  // 独立した箱として見た目が区切られている要素を、出現順に集める。
+  const blockSelector = '.period, h2, .step-desc, .checklist > li, .tip-box, .watch, .branch .q, .option';
+  const blocks = clone.querySelectorAll(blockSelector);
+
+  let rawText;
+  if(blocks.length){
+    rawText = Array.from(blocks)
+      .map(b => b.textContent.replace(/\s+/g,' ').trim())
+      .filter(Boolean)
+      .join(BLOCK_SENTINEL);
+  } else {
+    rawText = clone.textContent.replace(/\s+/g,' ').trim();
+  }
+
+  if(!pronunciationDict) pronunciationDict = buildPronunciationDict();
+  return applyPronunciation(rawText, pronunciationDict);
+}
+
+let activeBtn = null;
+let session = 0;
+let voicesReady = false;
+let japaneseVoice = null;
+const voiceWarningEl = document.getElementById('voiceWarning');
+
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  if(voices && voices.length){
+    voicesReady = true;
+    japaneseVoice = voices.find(v => v.lang === 'ja-JP') || voices.find(v => (v.lang||'').startsWith('ja')) || null;
+  }
+}
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+
+function setButtonState(btn, speaking){
+  btn.classList.toggle('speaking', speaking);
+  btn.setAttribute('aria-pressed', String(speaking));
+  btn.textContent = speaking ? (btn.dataset.stopLabel || '⏹ 止める') : (btn.dataset.playLabel || '🔊 読み上げ');
+}
+
+// テキストを「・」「句点」「改行・かっこ」「枠区切り」ごとに分割し、
+// それぞれに別の長さの間（ま）を割り当てる。
+// 「・」は本来ひと呼吸程度でよいのに既定のまま読むと不自然に長く止まり、
+// 逆に改行やかっこ、枠で区切られた要素同士は句読点が無いため
+// 何もしないと間が詰まって聞こえてしまう。
+const PAUSE_MS = {
+  dot: 160,      // 「・」= 半拍程度
+  sentence: 300, // 。.!?！？ など文の区切り
+  section: 300,  // 改行・かっこ（文中の意味のまとまりの境目）
+  block: 450,    // 枠線・背景色で独立した箱同士の境目（チェック項目・注意書きなど）
+  end: 0
+};
+
+function splitIntoChunks(text){
+  const DELIM = {
+    '・':'dot',
+    '。':'sentence', '.':'sentence', '!':'sentence', '?':'sentence', '！':'sentence', '？':'sentence',
+    '\n':'section', '(':'section', '（':'section', ')':'section', '）':'section',
+    [BLOCK_SENTINEL]:'block'
+  };
+  const chunks = [];
+  let buf = '';
+  for(const ch of text){
+    const type = DELIM[ch];
+    if(type){
+      const trimmed = buf.trim();
+      if(trimmed) chunks.push({ text: trimmed, pauseAfter: PAUSE_MS[type] });
+      buf = '';
+    } else {
+      buf += ch;
+    }
+  }
+  const rest = buf.trim();
+  if(rest) chunks.push({ text: rest, pauseAfter: 0 });
+  return chunks.length ? chunks : [{ text: text.trim(), pauseAfter: 0 }];
+}
+
+function stopSpeaking(){
+  session++;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(activeBtn){ setButtonState(activeBtn, false); }
+  activeBtn = null;
+}
+
+function playChunks(btn, chunks, mySession){
+  let i = 0;
+  function speakOne(){
+    if(mySession !== session) return;
+    if(i >= chunks.length){
+      setButtonState(btn, false);
+      if(activeBtn === btn) activeBtn = null;
+      return;
+    }
+    const chunk = chunks[i];
+    const u = new SpeechSynthesisUtterance(chunk.text);
+    u.lang = 'ja-JP';
+    if(japaneseVoice) u.voice = japaneseVoice;
+    u.rate = 0.95;
+    i++;
+    const advance = () => {
+      if(mySession !== session) return;
+      if(chunk.pauseAfter > 0){
+        setTimeout(speakOne, chunk.pauseAfter);
+      } else {
+        speakOne();
+      }
+    };
+    u.onend = advance;
+    u.onerror = advance;
+    window.speechSynthesis.speak(u);
+  }
+  speakOne();
+}
+
+function toggleSpeak(btn, text){
+  if(!('speechSynthesis' in window)){
+    alert('お使いの環境は音声読み上げに対応していません。');
+    return;
+  }
+  const wasThisPlaying = (activeBtn === btn);
+  stopSpeaking();
+  if(wasThisPlaying) return;
+
+  if(!voicesReady) refreshVoices();
+  if(voicesReady && !japaneseVoice){
+    voiceWarningEl.classList.add('show');
+    voiceWarningEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return;
+  }
+  voiceWarningEl.classList.remove('show');
+
+  const chunks = splitIntoChunks(text);
+  activeBtn = btn;
+  setButtonState(btn, true);
+  const mySession = session;
+  setTimeout(()=>playChunks(btn, chunks, mySession), 60);
+}
+
+document.getElementById('speakStep').addEventListener('click', function(){
+  toggleSpeak(this, getVisibleText(document.getElementById('stepCard')));
+});
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.hidden) stopSpeaking();
+});
+
+setInterval(()=>{
+  if('speechSynthesis' in window && window.speechSynthesis.speaking){
+    window.speechSynthesis.resume();
+  }
+}, 4000);
+
+// ================== 初期表示 ==================
+render();
+</script>
+</body>
+</html>
